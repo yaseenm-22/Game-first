@@ -2,78 +2,130 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Кочевник - Idle Clicker</title>
     <style>
-        body {
+        * {
             margin: 0;
-            font-family: Arial, sans-serif;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(to bottom, #87CEEB 0%, #90EE90 100%);
             height: 100vh;
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            touch-action: manipulation;
         }
 
+        /* Header */
         header {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .currency {
-            font-size: 1.2rem;
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
+        .income-display {
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            color: #555;
+        }
+
+        /* Main area */
         main {
             flex: 1;
             display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
         }
 
+        /* Click area */
         .click-area {
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+            min-height: 40vh;
         }
 
         #yurt {
-            font-size: 150px;
+            font-size: clamp(100px, 25vw, 180px);
             cursor: pointer;
             transition: transform 0.1s;
             user-select: none;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+            line-height: 1;
         }
 
         #yurt:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
         }
 
+        .click-hint {
+            margin-top: 15px;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            color: #333;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Shop */
         .shop {
-            width: 350px;
-            background: rgba(255, 255, 255, 0.9);
-            border-left: 2px solid rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.95);
+            border-top: 2px solid rgba(0,0,0,0.1);
             overflow-y: auto;
-            padding: 10px;
+            padding: 12px;
+            max-height: 45vh;
+        }
+
+        .shop-title {
+            text-align: center;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #333;
         }
 
         .item {
             background: white;
-            border-radius: 10px;
-            padding: 10px;
+            border-radius: 12px;
+            padding: 12px;
             margin-bottom: 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
             border: 2px solid transparent;
+            transition: all 0.2s;
+            min-height: 70px;
+        }
+
+        .item:active {
+            transform: scale(0.98);
         }
 
         .item:hover {
             border-color: #d4af37;
+            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
         }
 
         .item.disabled {
@@ -81,34 +133,82 @@
             cursor: not-allowed;
         }
 
+        .item.disabled:active {
+            transform: none;
+        }
+
         .item-icon {
-            font-size: 40px;
-            margin-right: 10px;
+            font-size: clamp(32px, 8vw, 48px);
+            margin-right: 12px;
+            flex-shrink: 0;
         }
 
         .item-info {
             flex: 1;
+            min-width: 0;
         }
 
+        .item-name {
+            font-weight: bold;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            margin-bottom: 2px;
+        }
+
+        .item-income {
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .item-cost {
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            color: #d4af37;
+            font-weight: bold;
+        }
+
+        .item-count {
+            font-weight: bold;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            background: #f0f0f0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            flex-shrink: 0;
+        }
+
+        /* Actions bar */
         .actions {
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             color: white;
             padding: 10px;
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         button {
-            padding: 10px 20px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            transition: all 0.2s;
+            min-height: 44px;
+            white-space: nowrap;
+        }
+
+        button:active {
+            transform: scale(0.95);
         }
 
         .btn-gold {
             background: #d4af37;
+            color: #333;
+        }
+
+        .btn-gold:hover {
+            background: #e5c158;
         }
 
         .btn-red {
@@ -116,6 +216,11 @@
             color: white;
         }
 
+        .btn-red:hover {
+            background: #ff6b7a;
+        }
+
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -126,27 +231,189 @@
             background: rgba(0,0,0,0.7);
             justify-content: center;
             align-items: center;
+            z-index: 1000;
+            padding: 20px;
         }
 
         .modal-content {
             background: white;
             padding: 30px;
-            border-radius: 15px;
+            border-radius: 16px;
             text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-content h2 {
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-content p {
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            margin-bottom: 20px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .modal-content button {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Floating text animation */
+        .float-text {
+            position: fixed;
+            font-weight: bold;
+            color: #d4af37;
+            font-size: 1.5rem;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 999;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) scale(1.3);
+            }
+        }
+
+        /* Tablet styles (768px - 1024px) */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            main {
+                flex-direction: row;
+            }
+
+            .click-area {
+                flex: 1;
+                min-height: auto;
+            }
+
+            .shop {
+                width: 380px;
+                max-height: none;
+                border-top: none;
+                border-left: 2px solid rgba(0,0,0,0.1);
+            }
+        }
+
+        /* Desktop styles (1024px+) */
+        @media (min-width: 1024px) {
+            main {
+                flex-direction: row;
+            }
+
+            .click-area {
+                flex: 1;
+                min-height: auto;
+            }
+
+            .shop {
+                width: 420px;
+                max-height: none;
+                border-top: none;
+                border-left: 2px solid rgba(0,0,0,0.1);
+            }
+
+            .item {
+                padding: 16px;
+            }
+
+            .item:hover {
+                transform: translateX(-5px);
+            }
+        }
+
+        /* Mobile landscape */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .click-area {
+                min-height: 35vh;
+                padding: 10px;
+            }
+
+            #yurt {
+                font-size: 80px;
+            }
+
+            .shop {
+                max-height: 55vh;
+            }
+
+            .actions {
+                padding: 8px;
+            }
+
+            button {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Very small phones */
+        @media (max-width: 360px) {
+            header {
+                padding: 10px 12px;
+            }
+
+            .actions {
+                gap: 6px;
+            }
+
+            button {
+                padding: 10px 14px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Scrollbar styling */
+        .shop::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .shop::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .shop::-webkit-scrollbar-thumb {
+            background: #d4af37;
+            border-radius: 3px;
+        }
+
+        /* Prevent text selection on mobile */
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        input, textarea {
+            -webkit-user-select: auto;
+            -moz-user-select: auto;
+            -ms-user-select: auto;
+            user-select: auto;
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="currency">🪙 <span id="mal">0</span> Мал</div>
-        <div>📈 <span id="income">0</span>/сек</div>
-        <div class="currency">💎 <span id="kut">0</span> Кут</div>
+        <div class="currency">🪙 <span id="mal">0</span></div>
+        <div class="income-display">📈 <span id="income">0</span>/сек</div>
+        <div class="currency">💎 <span id="kut">0</span></div>
     </header>
 
     <main>
         <div class="click-area">
             <div id="yurt">⛺</div>
-            <p>Кликайте по юрте!</p>
+            <p class="click-hint">Кликайте по юрте!</p>
         </div>
 
         <div class="shop" id="shop"></div>
@@ -154,7 +421,7 @@
 
     <div class="actions">
         <button class="btn-gold" onclick="activateToi()">🎉 Той</button>
-        <button class="btn-gold" onclick="showPrestige()">🏔️ Великий Көч</button>
+        <button class="btn-gold" onclick="showPrestige()">🏔️ Көч</button>
         <button class="btn-red" onclick="resetGame()">🗑️ Сброс</button>
     </div>
 
@@ -162,18 +429,19 @@
         <div class="modal-content">
             <h2 id="modal-title">Заголовок</h2>
             <p id="modal-text">Текст</p>
-            <button onclick="closeModal()">Закрыть</button>
+            <button class="btn-gold" onclick="closeModal()">Закрыть</button>
         </div>
     </div>
 
     <script>
-        // Игровые данные
         const buildings = [
-            { id: 'sheep', name: 'Овца', icon: '', cost: 15, income: 1, count: 0 },
+            { id: 'sheep', name: 'Овца', icon: '🐑', cost: 15, income: 1, count: 0 },
             { id: 'goat', name: 'Коза', icon: '🐐', cost: 100, income: 5, count: 0 },
-            { id: 'horse', name: 'Лошадь', icon: '🐎', cost: 1100, income: 32, count: 0 },
+            { id: 'horse', name: 'Лошадь', icon: '', cost: 1100, income: 32, count: 0 },
             { id: 'yak', name: 'Як', icon: '🐂', cost: 12000, income: 150, count: 0 },
-            { id: 'camel', name: 'Верблюд', icon: '🐪', cost: 130000, income: 800, count: 0 }
+            { id: 'camel', name: 'Верблюд', icon: '🐪', cost: 130000, income: 800, count: 0 },
+            { id: 'baatyr', name: 'Баатыр', icon: '🛡️', cost: 1400000, income: 4000, count: 0 },
+            { id: 'ordo', name: 'Ордо', icon: '🏰', cost: 20000000, income: 25000, count: 0 }
         ];
 
         let game = {
@@ -182,32 +450,36 @@
             lastSave: Date.now()
         };
 
-        // Загрузка игры
         function loadGame() {
             const saved = localStorage.getItem('kochevnik');
             if (saved) {
-                const data = JSON.parse(saved);
-                game = { ...game, ...data };
-                
-                // Офлайн доход
-                const seconds = (Date.now() - game.lastSave) / 1000;
-                if (seconds > 60) {
-                    const income = getTotalIncome();
-                    const offline = Math.floor(income * seconds);
-                    game.mal += offline;
-                    showModal('С возвращением!', `Вы получили ${offline} Мал пока отсутствовали`);
+                try {
+                    const data = JSON.parse(saved);
+                    game = { ...game, ...data };
+                    
+                    const seconds = (Date.now() - game.lastSave) / 1000;
+                    if (seconds > 60) {
+                        const income = getTotalIncome();
+                        const offline = Math.floor(income * seconds);
+                        if (offline > 0) {
+                            game.mal += offline;
+                            setTimeout(() => {
+                                showModal('С возвращением!', `Пока вас не было, стада принесли ${formatNumber(offline)} Мал 🎉`);
+                            }, 500);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error loading save:', e);
                 }
             }
             renderShop();
         }
 
-        // Сохранение
         function saveGame() {
             game.lastSave = Date.now();
             localStorage.setItem('kochevnik', JSON.stringify(game));
         }
 
-        // Общий доход
         function getTotalIncome() {
             let total = 0;
             buildings.forEach(b => {
@@ -216,22 +488,35 @@
             return total * (1 + game.kut * 0.1);
         }
 
-        // Клик по юрте
+        function formatNumber(num) {
+            if (num >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
+            if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return Math.floor(num).toString();
+        }
+
         document.getElementById('yurt').addEventListener('click', function(e) {
             const power = 1 + (game.kut * 0.1);
             game.mal += power;
             
-            // Эффект
-            const el = document.createElement('div');
-            el.textContent = '+' + Math.floor(power);
-            el.style.cssText = 'position:absolute;left:' + e.clientX + 'px;top:' + e.clientY + 'px;font-weight:bold;color:#d4af37;pointer-events:none;';
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 1000);
+            const rect = this.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top;
             
+            showFloatText(x, y, '+' + formatNumber(power));
             updateUI();
         });
 
-        // Покупка
+        function showFloatText(x, y, text) {
+            const el = document.createElement('div');
+            el.className = 'float-text';
+            el.textContent = text;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+
         function buy(id) {
             const b = buildings.find(x => x.id === id);
             if (game.mal >= b.cost) {
@@ -240,13 +525,13 @@
                 b.cost = Math.floor(b.cost * 1.15);
                 renderShop();
                 updateUI();
+                saveGame();
             }
         }
 
-        // Отрисовка магазина
         function renderShop() {
             const shop = document.getElementById('shop');
-            shop.innerHTML = '<h3 style="text-align:center">Магазин</h3>';
+            shop.innerHTML = '<div class="shop-title"> Магазин</div>';
             
             buildings.forEach(b => {
                 const div = document.createElement('div');
@@ -255,41 +540,49 @@
                 div.innerHTML = `
                     <div class="item-icon">${b.icon}</div>
                     <div class="item-info">
-                        <div><b>${b.name}</b></div>
-                        <div>+${b.income}/сек</div>
-                        <div style="color:#d4af37">🪙 ${b.cost}</div>
+                        <div class="item-name">${b.name}</div>
+                        <div class="item-income">+${formatNumber(b.income)}/сек</div>
+                        <div class="item-cost">🪙 ${formatNumber(b.cost)}</div>
                     </div>
-                    <div style="font-weight:bold">${b.count}</div>
+                    <div class="item-count">${b.count}</div>
                 `;
                 shop.appendChild(div);
             });
         }
 
-        // Обновление интерфейса
         function updateUI() {
-            document.getElementById('mal').textContent = Math.floor(game.mal);
-            document.getElementById('income').textContent = Math.floor(getTotalIncome());
+            document.getElementById('mal').textContent = formatNumber(game.mal);
+            document.getElementById('income').textContent = formatNumber(getTotalIncome());
             document.getElementById('kut').textContent = game.kut;
-            renderShop();
+            
+            const items = document.querySelectorAll('.item');
+            buildings.forEach((b, index) => {
+                if (items[index]) {
+                    if (game.mal < b.cost) {
+                        items[index].classList.add('disabled');
+                    } else {
+                        items[index].classList.remove('disabled');
+                    }
+                }
+            });
         }
 
-        // Той
         function activateToi() {
-            const income = getTotalIncome() * 2;
-            game.mal += income;
-            showModal('🎉 Той!', `Вы получили ${Math.floor(income)} Мал!`);
+            const bonus = getTotalIncome() * 30;
+            game.mal += bonus;
+            showModal('🎉 Той!', `Праздник принёс ${formatNumber(bonus)} Мал! Доход удвоен на 30 секунд`);
             updateUI();
+            saveGame();
         }
 
-        // Престиж
         function showPrestige() {
             const gain = Math.floor(Math.cbrt(game.mal / 1000000));
             if (gain > 0) {
-                showModal('Великий Көч', 
-                    `Получить ${gain} Кут?\n\nВесь прогресс сбросится!`,
+                showModal('🏔️ Великий Көч', 
+                    `Вы получите ${gain} Кут 💎\n\nВесь Мал и постройки сбросятся. Каждый Кут увеличивает доход на 10%.`,
                     () => doPrestige(gain));
             } else {
-                showModal('Великий Көч', 'Нужно至少 1,000,000 Мал для переселения');
+                showModal('🏔️ Великий Көч', `Нужно минимум 1,000,000 Мал для переселения. У вас: ${formatNumber(game.mal)}`);
             }
         }
 
@@ -301,7 +594,9 @@
                 b.cost = b.id === 'sheep' ? 15 : 
                          b.id === 'goat' ? 100 : 
                          b.id === 'horse' ? 1100 : 
-                         b.id === 'yak' ? 12000 : 130000;
+                         b.id === 'yak' ? 12000 :
+                         b.id === 'camel' ? 130000 :
+                         b.id === 'baatyr' ? 1400000 : 20000000;
             });
             saveGame();
             renderShop();
@@ -309,15 +604,13 @@
             closeModal();
         }
 
-        // Сброс
         function resetGame() {
-            if (confirm('Точно сбросить весь прогресс?')) {
+            if (confirm('Точно сбросить весь прогресс? Это действие нельзя отменить!')) {
                 localStorage.removeItem('kochevnik');
                 location.reload();
             }
         }
 
-        // Модальное окно
         function showModal(title, text, callback) {
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-text').textContent = text;
@@ -334,17 +627,16 @@
             document.getElementById('modal').style.display = 'none';
         }
 
-        // Игровой цикл
         setInterval(() => {
             const income = getTotalIncome();
             game.mal += income;
             updateUI();
         }, 1000);
 
-        // Автосохранение
         setInterval(saveGame, 10000);
 
-        // Старт
+        window.addEventListener('beforeunload', saveGame);
+
         loadGame();
         updateUI();
     </script>
